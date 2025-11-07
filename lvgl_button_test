@@ -1,0 +1,191 @@
+#include "my_ui.h"
+#include <stdio.h>
+
+//LV_EVENT_RELEASED
+//LV_EVENT_VALUE_CHANGED
+
+void slider_4_cb(lv_event_t * event){
+    //获取滑块源对象
+    lv_obj_t * slider = lv_event_get_target(event);
+
+    //读取右手柄的值
+    int32_t value = lv_slider_get_value(slider);
+
+    //获取label对象
+    lv_obj_t * label = lv_event_get_user_data(event);//从事件对象中获取预先存储的 “标签（label）对象
+
+    /*
+    lv_label_set_text 直接设置固定文本
+    lv_label_set_text_fmt 支持用格式符拼接动态内容（类似 C 语言 printf）
+    */
+    //设置label的值
+    lv_label_set_text_fmt(label,"%d",value);
+}
+
+void slider_3_cb(lv_event_t * event){
+    //获取滑块源对象
+    lv_obj_t * slider = lv_event_get_target(event);
+
+    //读取左手柄的值
+    int32_t start = lv_slider_get_left_value(slider);
+
+    //读取右手柄的值
+    int32_t end = lv_slider_get_value(slider);
+
+    //获取label对象
+    lv_obj_t * label = lv_event_get_user_data(event);//从事件对象中获取预先存储的 “标签（label）对象
+
+    /*
+    lv_label_set_text 直接设置固定文本
+    lv_label_set_text_fmt 支持用格式符拼接动态内容（类似 C 语言 printf）
+    */
+    //设置label的值
+    lv_label_set_text_fmt(label,"%d-%d",start,end);
+}
+
+void slider_1_cb(lv_event_t * event){
+    //获取对象源目标
+    lv_obj_t * slider = lv_event_get_target(event);
+    
+    //获取对象的事件
+    lv_event_code_t slider_event = lv_event_get_code(event);
+
+    //获取当前值
+    uint32_t val = lv_slider_get_value(slider);
+
+    if(LV_EVENT_VALUE_CHANGED == slider_event){
+        printf("%d\n",val);
+    }
+}
+
+void button_cb(lv_event_t * event){
+    lv_obj_t * slider_1 = lv_event_get_user_data(event);
+
+    //设置当前值
+    lv_slider_set_value(slider_1,50,LV_ANIM_ON);
+
+    //添加事件
+    lv_obj_add_event_cb(slider_1,slider_1_cb,LV_EVENT_VALUE_CHANGED,NULL);
+
+    printf("button_1\n");
+}
+
+void slider_demo_1(void){
+    //创建一个slider_1
+    lv_obj_t * slider_1 = lv_slider_create(lv_scr_act());
+    
+    //设置滑块位置
+    lv_obj_center(slider_1);
+
+    //设置最大值
+    lv_slider_set_max_value(slider_1,500);
+
+    //设置最小值
+    lv_slider_set_min_value(slider_1,0);
+
+    //增加动画
+    lv_obj_set_style_anim_time(slider_1,500,0);
+
+    //设置方向
+    lv_obj_set_size(slider_1,20,300);//宽度小于高度垂直，反之平行
+
+    //创建一个按钮
+    lv_obj_t * button_1 = lv_button_create(lv_scr_act());
+
+    //为按钮增加事件
+    lv_obj_set_flag(button_1,LV_OBJ_FLAG_CHECKABLE,0);
+
+    //设置回调函数
+    lv_obj_add_event_cb(button_1,button_cb,LV_EVENT_PRESSED,slider_1);
+}
+
+void slider_demo_2(void){
+    //创建一个slider_2
+    lv_obj_t * slider_2 = lv_slider_create(lv_scr_act());
+    
+    //设置滑块位置
+    lv_obj_center(slider_2);
+
+    //设置模式
+    lv_slider_set_mode(slider_2,LV_SLIDER_MODE_RANGE);
+}
+
+void slider_demo_3(void){
+    //创建一个slider_3
+    lv_obj_t * slider_3 = lv_slider_create(lv_scr_act());
+    
+    //设置滑块位置
+    lv_obj_center(slider_3);
+
+    //设置模式  范围模式
+    lv_slider_set_mode(slider_3,LV_SLIDER_MODE_RANGE);
+
+    //设置范围
+    lv_slider_set_range(slider_3,0,100);
+
+    //设置动画
+    lv_obj_set_style_anim_time(slider_3,500,0);
+
+            /*
+            第一次设置起始值时，结束值还是默认的 0，
+            导致起始值被 “卡” 成 0；后面改结束值时，
+            起始值不会自动恢复，因为你没再重新设置它。
+            */
+    //设置结束值（先设结束值，再设起始值）
+    lv_slider_set_value(slider_3,80,LV_ANIM_ON);
+
+    //设置起始值
+    lv_slider_set_start_value(slider_3,30,LV_ANIM_ON);
+
+    //创建标签
+    lv_obj_t * label_1 = lv_label_create(lv_scr_act());
+
+    //设置标签初始字符
+    lv_label_set_text(label_1,"50--80");
+
+    //设置标签位置
+    lv_obj_align_to(label_1,slider_3,LV_ALIGN_OUT_BOTTOM_MID,0,10);
+
+    //绑定事件
+    lv_obj_add_event_cb(slider_3,slider_3_cb,LV_EVENT_VALUE_CHANGED,label_1);
+}
+
+//对称模式
+void slider_demo_4(void){
+    //创建一个slider_3
+    lv_obj_t * slider_4 = lv_slider_create(lv_scr_act());
+    
+    //设置滑块位置
+    lv_obj_center(slider_4);
+
+    //设置模式  范围模式
+    lv_slider_set_mode(slider_4,LV_SLIDER_MODE_SYMMETRICAL);
+
+    //设置范围
+    lv_slider_set_range(slider_4,-100,100);
+
+    //设置动画
+    lv_obj_set_style_anim_time(slider_4,500,0);
+
+    //设置初始值
+    lv_slider_set_value(slider_4,0,LV_ANIM_ON);
+
+    //创建标签
+    lv_obj_t * label_2 = lv_label_create(lv_scr_act());
+
+    //设置标签初始字符
+    lv_label_set_text(label_2,"0");
+
+    //设置标签位置
+    lv_obj_align_to(label_2,slider_4,LV_ALIGN_OUT_BOTTOM_MID,0,10);
+
+    //绑定事件
+    lv_obj_add_event_cb(slider_4,slider_4_cb,LV_EVENT_VALUE_CHANGED,label_2);
+}
+
+void my_ui_init(void){
+    //slider_demo_1();
+    //slider_demo_2();
+    //slider_demo_3();
+    slider_demo_4();
+}
